@@ -189,7 +189,7 @@ class FeatureDropper(BaseEstimator, TransformerMixin):
         :returns: Data without unwanted features
         """
         X = X.copy()
-        return X.drop(self.variables, axis=1)
+        return X.drop(self.vars_to_drop, axis=1)
 
 
 class RareLabelEncoder(BaseEstimator, TransformerMixin):
