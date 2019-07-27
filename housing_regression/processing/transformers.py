@@ -144,7 +144,7 @@ class UnivariateTransformer(BaseEstimator, TransformerMixin):
 
     def __init__(self,
                  variables: List[str],
-                 func: Union[Callable, str]
+                 func: Callable
                  ):
     
         self.variables = variables
