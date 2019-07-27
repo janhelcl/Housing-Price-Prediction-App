@@ -47,3 +47,33 @@ class TemporalDifferenceTransformer(BaseEstimator, TransformerMixin):
             X[feature] = X[self.reference_var] - X[feature]
 
         return X
+    
+    
+class FeatureDropper(BaseEstimator, TransformerMixin):
+    """Drops selected columns.
+    
+    Drops selected columns inside of a scikit-learn pipline. Useful for example
+    for features used fo feature engineering in previous steps that are
+    no longer needed.
+    
+    :param vars_to_drop: List of features to drop
+    """ 
+
+    def __init__(self,
+                 vars_to_drop: List[str] = None
+                 ):
+        self.vars_to_drop = vars_to_drop
+
+    def fit(self, X, y=None):
+        "For compatibility only"
+        return self
+
+    def transform(self, X):
+        """Drops selected columns
+        
+        :param X: pd.DataFrame of model predictors
+        """
+        X = X.copy()
+        X = X.drop(self.variables, axis=1)
+
+        return X
