@@ -30,7 +30,7 @@ class ColumnTransformerDF(ColumnTransformer):
     
     :param transformers: List of (name, transformer, column(s)) tuples 
         specifying the transformer objects to be applied to subsets of the data
-    :param remainder: what to do with remaining columns - 'drop', 'passthrough' 
+    :param remainder: what to do with remaining columns - 'drop', 'passthrough'
         or an estimator
     """
      
@@ -59,25 +59,70 @@ class ColumnTransformerDF(ColumnTransformer):
         """
         return pd.DataFrame(data=super().transform(X),
                             columns=self.columns_)
-
-
-# TODO: generalize to any bivariate transformation not only difference
-class TemporalDifferenceTransformer(BaseEstimator, TransformerMixin):
-    """Temporal variable calculator.
+  
+ 
+class UnivariateTransformer(BaseEstimator, TransformerMixin):
+    """Applies provided function to the selected columns
     
-    Calculates difference in time from a single reference variable.
-    
-    :param temp_vars: List of temporal variables
-    :param reference_var: Reference variable
+    :param variables: List of variables to be encoded
+    :param func: function to be applied (must support pd.Series as input)
     """
 
     def __init__(self,
-                 temp_vars: List[str],
-                 reference_var: str
+                 variables: List[str],
+                 func: Callable
+                 ):
+    
+        self.variables = variables
+        self.func = func
+        
+    def fit(self, X, y=None):
+        "For compatibility only"
+        return self
+
+    def transform(self,
+                  X: pd.DataFrame
+                  ) -> pd.DataFrame:
+        """Applies provided function to the selected columns
+        
+        :param X: pd.DataFrame of model predictors
+        
+        :returns: Transformed data
+        """
+        X = X.copy()
+        for feature in self.variables:
+            try:
+                X[feature] = self.func(X[feature])
+            except Exception as error:
+                raise InvalidInputError(
+                        ("Provided function failed to transform"
+                         f" column {feature}.")
+                                        ) from error
+        return X
+
+
+# TODO: add option to add new column insted of transforming the old in place
+class BivariateTransformer(BaseEstimator, TransformerMixin):
+    """Transforms all selected features using another feature
+    
+    Apllies provided function with the signature: f(varible, reference_var).
+    For example: if provided 'lambda a, b: a / b' then all provided variables
+    will be transformed into ratios with reference_var as denominator
+    
+    :param variables: List of temporal variables
+    :param reference_var: Reference variable
+    :param func: Callable combining two pd.Series: f(varible, reference_var)
+    """
+
+    def __init__(self,
+                 variables: List[str],
+                 reference_var: str,
+                 func: str = 'ratio'
                  ):
 
-        self.temp_vars = temp_vars
+        self.variables = variables
         self.reference_var = reference_var
+        self.func = func
 
     def fit(self, X, y=None):
         "For compatibility only"
@@ -94,8 +139,8 @@ class TemporalDifferenceTransformer(BaseEstimator, TransformerMixin):
         :returns: Transformed data
         """
         X = X.copy()
-        for feature in self.temp_vars:
-            X[feature] = X[self.reference_var] - X[feature]
+        for feature in self.variables:
+            X[feature] = self.func(X[feature], X[self.reference_var])
 
         return X
     
@@ -105,7 +150,7 @@ class FeatureDropper(BaseEstimator, TransformerMixin):
     
     Drops selected columns inside of a scikit-learn pipline. Useful for example
     for features used for feature engineering in previous steps that are
-    no longer needed.
+    no longer needed. Typically used after BivariateTransformer.
     
     :param vars_to_drop: List of features to drop
     """ 
@@ -184,45 +229,5 @@ class RareLabelEncoder(BaseEstimator, TransformerMixin):
             X[feature] = np.where(X[feature].isin(
                 self.frequent_labels_[feature]), X[feature], 'rare')
 
-        return X
-
-
-class UnivariateTransformer(BaseEstimator, TransformerMixin):
-    """Applies provided function to the selected columns
-    
-    :param variables: List of variables to be encoded
-    :param func: function to be applied (must support pd.Series as input)
-    """
-
-    def __init__(self,
-                 variables: List[str],
-                 func: Callable
-                 ):
-    
-        self.variables = variables
-        self.func = func
-        
-    def fit(self, X, y=None):
-        "For compatibility only"
-        return self
-
-    def transform(self,
-                  X: pd.DataFrame
-                  ) -> pd.DataFrame:
-        """Applies provided function to the selected columns
-        
-        :param X: pd.DataFrame of model predictors
-        
-        :returns: Transformed data
-        """
-        X = X.copy()
-        for feature in self.variables:
-            try:
-                X[feature] = self.func(X[feature])
-            except Exception as error:
-                raise InvalidInputError(
-                        ("Provided function failed to transform"
-                         f" column {feature}.")
-                                        ) from error
         return X
     
