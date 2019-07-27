@@ -3,7 +3,7 @@ Configuration of a simple model used to test various aspects of the pipeline
 """
 SEED = 42
 
-LABEL = 'SalesPrice'
+LABEL = 'SalePrice'
 
 # all variables used in the pipeline
 FEATURES = [# predictors
