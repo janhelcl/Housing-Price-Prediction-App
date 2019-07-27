@@ -33,7 +33,7 @@ class ColumnTransformerDF(ColumnTransformer):
     :param remainder: what to do with remaining columns - 'drop', 'passthrough'
         or an estimator
     """
-     
+    
     def fit(self,
             X: pd.DataFrame,
             y=None
@@ -46,7 +46,7 @@ class ColumnTransformerDF(ColumnTransformer):
         :returns: self
         """
         self.columns_ = X.columns
-        return super().fit(X, y)
+        return super().fit(X, y=y)
     
     def transform(self,
                   X: pd.DataFrame
@@ -57,8 +57,22 @@ class ColumnTransformerDF(ColumnTransformer):
         
         :returns: Transformed data
         """
+        X = X.copy()
         return pd.DataFrame(data=super().transform(X),
                             columns=self.columns_)
+        
+    def fit_transform(self,
+                      X:pd.DataFrame,
+                      y=None) -> pd.DataFrame:
+        """Fit and then transform
+        
+        :param X: pd.DataFrame of model predictors
+        
+        :returns: Transformed data
+        """
+        X = X.copy()
+        return pd.DataFrame(data=super().fit_transform(X, y),
+                            columns=X.columns)
   
  
 class UnivariateTransformer(BaseEstimator, TransformerMixin):
@@ -140,7 +154,7 @@ class BivariateTransformer(BaseEstimator, TransformerMixin):
         """
         X = X.copy()
         for feature in self.variables:
-            X[feature] = self.func(X[feature], X[self.reference_var])
+            X[feature] = self.func(X[feature].copy(), X[self.reference_var].copy())
 
         return X
     
@@ -165,7 +179,9 @@ class FeatureDropper(BaseEstimator, TransformerMixin):
         "For compatibility only"
         return self
 
-    def transform(self, X):
+    def transform(self,
+                  X: pd.DataFrame
+                  ) -> pd.DataFrame:
         """Drops selected columns
         
         :param X: pd.DataFrame of model predictors
@@ -173,9 +189,7 @@ class FeatureDropper(BaseEstimator, TransformerMixin):
         :returns: Data without unwanted features
         """
         X = X.copy()
-        X = X.drop(self.variables, axis=1)
-
-        return X
+        return X.drop(self.variables, axis=1)
 
 
 class RareLabelEncoder(BaseEstimator, TransformerMixin):
@@ -228,6 +242,5 @@ class RareLabelEncoder(BaseEstimator, TransformerMixin):
         for feature in self.variables:
             X[feature] = np.where(X[feature].isin(
                 self.frequent_labels_[feature]), X[feature], 'rare')
-
         return X
     
