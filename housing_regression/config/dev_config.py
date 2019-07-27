@@ -1,6 +1,8 @@
 """
 Configuration of a simple model used to test various aspects of the pipeline
 """
+SEED = 42
+
 # all variables used in the pipeline
 FEATURES = [# predictors
             'GrLivArea', # numeric to transform
