@@ -3,6 +3,8 @@ Configuration of a simple model used to test various aspects of the pipeline
 """
 SEED = 42
 
+LABEL = 'SalesPrice'
+
 # all variables used in the pipeline
 FEATURES = [# predictors
             'GrLivArea', # numeric to transform
