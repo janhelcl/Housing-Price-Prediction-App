@@ -1,7 +1,7 @@
 """
 Collection of custom scikit-learn compatible transformers.
 """
-from typing import List
+from typing import List, Union, Callable
 
 import numpy as np
 import pandas as pd
@@ -59,7 +59,7 @@ class FeatureDropper(BaseEstimator, TransformerMixin):
     """ 
 
     def __init__(self,
-                 vars_to_drop: List[str] = None
+                 vars_to_drop: List[str]
                  ):
 
         self.vars_to_drop = vars_to_drop
@@ -87,18 +87,18 @@ class RareLabelEncoder(BaseEstimator, TransformerMixin):
     Merge all rare labels (proportin below selected tolerance) into one
     category 'rare'. Previously unseen labels during transform are also
     encoded as 'rare'.
-    
-    :param tol: Tolerance level, lables below this proportion will be merged
+
     :param variables: List of variables to be encoded
+    :param tol: Tolerance level, lables below this proportion will be merged
     """
 
     def __init__(self, 
-                 tol:float = 0.0,
-                 variables: List[str] = None
+                 variables: List[str],
+                 tol:float = 0.0
                  ):
         
-        self.tol = tol
         self.variables = variables
+        self.tol = tol
 
     def fit(self,
             X: pd.DataFrame,
@@ -132,4 +132,44 @@ class RareLabelEncoder(BaseEstimator, TransformerMixin):
             X[feature] = np.where(X[feature].isin(
                 self.frequent_labels_[feature]), X[feature], 'rare')
 
+        return X
+
+
+class UnivariateTransformer(BaseEstimator, TransformerMixin):
+    """Applies provided function to the selected columns
+    
+    :param variables: List of variables to be encoded
+    :param func: function to be applied (must support pd.Series as input)
+    """
+
+    def __init__(self,
+                 variables: List[str],
+                 func: Union[Callable, str]
+                 ):
+    
+        self.variables = variables
+        self.func = func
+        
+    def fit(self, X, y=None):
+        "For compatibility only"
+        return self
+
+    def transform(self,
+                  X: pd.DataFrame
+                  ) -> pd.DataFrame:
+        """Applies provided function to the selected columns
+        
+        :param X: pd.DataFrame of model predictors
+        
+        :returns: Transformed data
+        """
+        X = X.copy()
+        for feature in self.variables:
+            try:
+                X[feature] = self.func(X[feature])
+            except Exception as error:
+                raise InvalidInputError(
+                        ("Provided function failed to transform"
+                         f" column {feature}.")
+                                        ) from error
         return X
