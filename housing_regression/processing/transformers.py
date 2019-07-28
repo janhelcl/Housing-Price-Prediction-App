@@ -27,26 +27,14 @@ class ColumnTransformerDF(ColumnTransformer):
     Unlike the original sklearn implementation, there is one more assumption:
     there must be 1:1 correspondence between original and transformed columns.
     Will not work for example with sklearn.preprocessing.OneHotEncoder.
+    Also unlike the original version ColumnTransformerDF preserves the 
+    column ordering.
     
     :param transformers: List of (name, transformer, column(s)) tuples 
         specifying the transformer objects to be applied to subsets of the data
     :param remainder: what to do with remaining columns - 'drop', 'passthrough'
         or an estimator
     """
-    
-    def fit(self,
-            X: pd.DataFrame,
-            y=None
-            ) -> 'ColumnTransformerDF':
-        """Fit all transformers using X
-        
-        :param X: pd.DataFrame of model predictors
-        :param y: For compatibility only
-        
-        :returns: self
-        """
-        self.columns_ = X.columns
-        return super().fit(X, y=y)
     
     def transform(self,
                   X: pd.DataFrame
@@ -57,9 +45,8 @@ class ColumnTransformerDF(ColumnTransformer):
         
         :returns: Transformed data
         """
-        X = X.copy()
-        return pd.DataFrame(data=super().transform(X),
-                            columns=self.columns_)
+        return self._reconstruct_df(transformed=super().transform(X),
+                                    original_order=X.columns)
         
     def fit_transform(self,
                       X:pd.DataFrame,
@@ -70,9 +57,37 @@ class ColumnTransformerDF(ColumnTransformer):
         
         :returns: Transformed data
         """
-        X = X.copy()
-        return pd.DataFrame(data=super().fit_transform(X, y),
-                            columns=X.columns)
+        return self._reconstruct_df(transformed=super().fit_transform(X, y),
+                                    original_order=X.columns)
+    
+    def _reconstruct_df(self, transformed, original_order):
+        """Reconstructs dataframe after transformations
+        """
+        df = pd.DataFrame(data=transformed,
+                          columns=self._find_column_order(original_order))
+        return df[original_order]
+    
+    def _find_column_order(self, original: List[str]):
+        """Finds column ordering after tranformations"""
+        tr_order, rem = self._inspect_transformers()
+        if rem is None:
+            return tr_order
+        else:
+            tr_order.extend([original[i] for i in rem])
+            return tr_order        
+        
+    def _inspect_transformers(self):
+        """inspects self.transformers_ for column order"""
+        transformed_order = []
+        remainder = None
+        for tran_tpl in self.transformers_:
+            if tran_tpl[1] == 'drop':
+                pass
+            elif tran_tpl[1] == 'passthrough':
+                remainder = tran_tpl[2]
+            else:
+                transformed_order.extend(tran_tpl[2])
+        return transformed_order, remainder
   
  
 class UnivariateTransformer(BaseEstimator, TransformerMixin):
@@ -106,7 +121,7 @@ class UnivariateTransformer(BaseEstimator, TransformerMixin):
         X = X.copy()
         for feature in self.variables:
             try:
-                X[feature] = self.func(X[feature])
+                X[feature] = np.log(X[feature])
             except Exception as error:
                 raise InvalidInputError(
                         ("Provided function failed to transform"
@@ -152,11 +167,18 @@ class BivariateTransformer(BaseEstimator, TransformerMixin):
         
         :returns: Transformed data
         """
+        print("transform")
         X = X.copy()
         for feature in self.variables:
-            X[feature] = self.func(X[feature].copy(), X[self.reference_var].copy())
+            print(np)
+            print(self.func)
+            X[feature] = self.func(X[feature], X[self.reference_var])
 
         return X
+    
+    def fit_transform(self, X, y):
+        print("fit_transform")
+        return self.transform(X)
     
     
 class FeatureDropper(BaseEstimator, TransformerMixin):
