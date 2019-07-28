@@ -4,7 +4,7 @@ Collection of custom scikit-learn compatible transformers.
 For convenience with pipeline configuration made to work with pd.DataFrames.
 Can be turned into separate package and specified as a dependency once stable.
 """
-from typing import List, Callable
+from typing import List, Tuple, Callable
 
 import numpy as np
 import pandas as pd
@@ -60,14 +60,17 @@ class ColumnTransformerDF(ColumnTransformer):
         return self._reconstruct_df(transformed=super().fit_transform(X, y),
                                     original_order=X.columns)
     
-    def _reconstruct_df(self, transformed, original_order):
+    def _reconstruct_df(self,
+                        transformed: pd.DataFrame,
+                        original_order: List[str]
+                        ) -> pd.DataFrame:
         """Reconstructs dataframe after transformations
         """
         df = pd.DataFrame(data=transformed,
                           columns=self._find_column_order(original_order))
         return df[original_order]
     
-    def _find_column_order(self, original: List[str]):
+    def _find_column_order(self, original: List[str]) -> List[str]:
         """Finds column ordering after tranformations"""
         tr_order, rem = self._inspect_transformers()
         if rem is None:
@@ -76,7 +79,7 @@ class ColumnTransformerDF(ColumnTransformer):
             tr_order.extend([original[i] for i in rem])
             return tr_order        
         
-    def _inspect_transformers(self):
+    def _inspect_transformers(self) -> Tuple[List[str], List[int]]:
         """inspects self.transformers_ for column order"""
         transformed_order = []
         remainder = None
