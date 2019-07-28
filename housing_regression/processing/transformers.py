@@ -28,7 +28,7 @@ class ColumnTransformerDF(ColumnTransformer):
     there must be 1:1 correspondence between original and transformed columns.
     Will not work for example with sklearn.preprocessing.OneHotEncoder.
     Also unlike the original version ColumnTransformerDF preserves the 
-    column ordering.
+    column ordering and data types.
     
     :param transformers: List of (name, transformer, column(s)) tuples 
         specifying the transformer objects to be applied to subsets of the data
@@ -46,7 +46,8 @@ class ColumnTransformerDF(ColumnTransformer):
         :returns: Transformed data
         """
         return self._reconstruct_df(transformed=super().transform(X),
-                                    original_order=X.columns)
+                                    original_order=X.columns,
+                                    dtypes=X.dtypes)
         
     def fit_transform(self,
                       X:pd.DataFrame,
@@ -58,16 +59,19 @@ class ColumnTransformerDF(ColumnTransformer):
         :returns: Transformed data
         """
         return self._reconstruct_df(transformed=super().fit_transform(X, y),
-                                    original_order=X.columns)
+                                    original_order=X.columns,
+                                    dtypes=X.dtypes)
     
     def _reconstruct_df(self,
                         transformed: pd.DataFrame,
-                        original_order: List[str]
+                        original_order: List[str],
+                        dtypes: pd.Series
                         ) -> pd.DataFrame:
         """Reconstructs dataframe after transformations
         """
         df = pd.DataFrame(data=transformed,
                           columns=self._find_column_order(original_order))
+        df = self._fix_dtypes(df, dtypes)
         return df[original_order]
     
     def _find_column_order(self, original: List[str]) -> List[str]:
@@ -91,6 +95,12 @@ class ColumnTransformerDF(ColumnTransformer):
             else:
                 transformed_order.extend(tran_tpl[2])
         return transformed_order, remainder
+    
+    @staticmethod
+    def _fix_dtypes(df: pd.DataFrame, dtypes: pd.Series):
+        for col in df:
+            df[col] = df[col].astype(dtypes[col])
+        return df
   
  
 class UnivariateTransformer(BaseEstimator, TransformerMixin):
@@ -124,7 +134,7 @@ class UnivariateTransformer(BaseEstimator, TransformerMixin):
         X = X.copy()
         for feature in self.variables:
             try:
-                X[feature] = np.log(X[feature])
+                X[feature] = self.func(X[feature])
             except Exception as error:
                 raise InvalidInputError(
                         ("Provided function failed to transform"
