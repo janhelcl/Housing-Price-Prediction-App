@@ -180,18 +180,11 @@ class BivariateTransformer(BaseEstimator, TransformerMixin):
         
         :returns: Transformed data
         """
-        print("transform")
         X = X.copy()
         for feature in self.variables:
-            print(np)
-            print(self.func)
             X[feature] = self.func(X[feature], X[self.reference_var])
 
         return X
-    
-    def fit_transform(self, X, y):
-        print("fit_transform")
-        return self.transform(X)
     
     
 class FeatureDropper(BaseEstimator, TransformerMixin):
