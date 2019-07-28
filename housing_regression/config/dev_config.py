@@ -22,7 +22,7 @@ NUMERIC_VARS = [var for var in FEATURES if var not in CATEGORICAL_VARS]
 
 # to test FE in pipeline
 TEMPORAL_VARS = ['YearRemodAdd']
-DROP_FEATURES = 'YrSold'
+DROP_FEATURES = ['YrSold']
 
 # variables to log transform
 NUMERICALS_LOG_VARS = ['GrLivArea']

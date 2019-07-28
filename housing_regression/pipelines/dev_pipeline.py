@@ -11,14 +11,10 @@ from sklearn.pipeline import Pipeline
 import config.dev_config as conf
 from processing import transformers as tran
 
-multi_label_encoder = tran.ColumnTransformerDF(
-        [('LabelEncoder', LabelEncoder(), conf.CATEGORICAL_VARS)],
-        remainder='passthrough'
-        )
-
+# different imputing strategy for categorical and numeric
 imputer = tran.ColumnTransformerDF([
         ('CategoricalImputer', 
-         SimpleImputer(strategy='most_frequent'), 
+         SimpleImputer(strategy='most_frequent'),
          conf.CATEGORICAL_VARS
         ),
         ('NumericalImputer',
@@ -29,24 +25,34 @@ imputer = tran.ColumnTransformerDF([
         remainder='passthrough'
         )
 
-ohe = ColumnTransformer([
-        ('OHE', OneHotEncoder(), conf.CATEGORICAL_VARS)],
+# FE: time pased between two dates
+def diff(a, b):
+    return b - a
+
+temporal = tran.BivariateTransformer(
+        variables=conf.TEMPORAL_VARS,
+        reference_var=conf.DROP_FEATURES[0],
+        func=diff
+        )
+
+# log transform selected features
+log_tran = tran.UnivariateTransformer(
+        variables=conf.NUMERICALS_LOG_VARS,
+        func=np.log
+        )
+
+# ohe all categorical variables
+ohe = ColumnTransformer(
+        [('OHE', OneHotEncoder(), conf.CATEGORICAL_VARS)],
         remainder='passthrough'
         )
 
 dev_pipeline = Pipeline([
-        ('MultiLabelEncoder', multi_label_encoder),
         ('Imputer', imputer),
-        ('TemporalFE', tran.BivariateTransformer(
-                variables=conf.TEMPORAL_VARS,
-                reference_var=conf.DROP_FEATURES,
-                func=lambda a, b: a - b
-                )),
+        ('TemporalFE', temporal),
         ('DropAfterFE', tran.FeatureDropper(vars_to_drop=conf.DROP_FEATURES)),
         ('RareEncoder', tran.RareLabelEncoder(conf.CATEGORICAL_VARS)),
-        ('LogTransform', tran.UnivariateTransformer(
-                variables=conf.NUMERICALS_LOG_VARS,
-                func=np.log)),
+        ('LogTransform', log_tran),
         ('OneHotEncoder', ohe),
         ('LinearModel', LinearRegression())
         ])
