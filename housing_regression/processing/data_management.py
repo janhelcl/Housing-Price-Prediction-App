@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 
 
 def load_dataset(path: str) -> pd.DataFrame:
-    """Loads data
+    """Loads csv data
     """
     # TODO: logging
     return pd.read_csv(path)
@@ -20,3 +20,11 @@ def save_pipeline(pipe: Pipeline, path: str) -> None:
     """
     # TODO: logging, managing other pipelines
     joblib.dump(pipe, path)
+
+
+def load_pipeline(path: str) -> Pipeline:
+    """Load a persisted pipeline
+    """
+    #TODO: logging
+    trained_model = joblib.load(filename=path)
+    return trained_model
