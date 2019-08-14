@@ -1,7 +1,7 @@
 """
-Script to score new data with the pipeline
+Script to score new data with a persisted pipeline
 
-TODO: extend to select one of multiple pipelines
+TODO: extend to select one of multiple pipeliness
 """
 import pandas as pd
 
