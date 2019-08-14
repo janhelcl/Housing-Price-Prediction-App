@@ -3,6 +3,8 @@ Script to score new data with a persisted pipeline
 
 TODO: extend to select one of multiple pipeliness
 """
+from typing import Dict, Any
+
 import pandas as pd
 
 import config.dev_config as conf
@@ -14,7 +16,7 @@ PIPELINE_PATH = 'trained_models/pipe.pkl'
 _pipeline = dm.load_pipeline(PIPELINE_PATH)
 
 
-def predict(input_data) -> dict:
+def predict(input_data: Dict[str, Any]) -> dict:
     """Make prediction using persisted pipeline
     """
     data = pd.read_json(input_data)
