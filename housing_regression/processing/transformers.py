@@ -182,7 +182,13 @@ class BivariateTransformer(BaseEstimator, TransformerMixin):
         """
         X = X.copy()
         for feature in self.variables:
-            X[feature] = self.func(X[feature], X[self.reference_var])
+            try:
+                X[feature] = self.func(X[feature], X[self.reference_var])
+            except Exception as error:
+                raise InvalidInputError(
+                        ("Provided function failed to transform"
+                         f" column {feature}.")
+                                        ) from error
 
         return X
     
