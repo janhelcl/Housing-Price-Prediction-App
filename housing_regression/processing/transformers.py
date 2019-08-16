@@ -11,7 +11,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.compose import ColumnTransformer
 
-from processing.exceptions import InvalidInputError
+from housing_regression.processing.exceptions import InvalidInputError
 
 
 class ColumnTransformerDF(ColumnTransformer):

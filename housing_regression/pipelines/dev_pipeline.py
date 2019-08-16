@@ -8,8 +8,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 
-import config.dev_config as conf
-from processing import transformers as tran
+import housing_regression.config.dev_config as conf
+from housing_regression.processing import transformers as tran
 
 # different imputing strategy for categorical and numeric
 imputer = tran.ColumnTransformerDF([
