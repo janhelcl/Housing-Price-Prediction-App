@@ -1,5 +1,5 @@
 """
-Script to fit the pipeline
+Script to fit and persist the pipeline
 
 # TODO: generalize to fit and persist a selected (not hardcoded) pipeline
 """
