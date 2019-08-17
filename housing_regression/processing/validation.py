@@ -2,6 +2,7 @@
 Functionality to validate the imput data
 
 # TODO: extend to allow different pipes have different conditions
+# TODO: report which rows where filtered
 """
 import pandas as pd
 

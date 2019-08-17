@@ -43,7 +43,7 @@ log_tran = tran.UnivariateTransformer(
 
 # ohe all categorical variables
 ohe = ColumnTransformer(
-        [('OHE', OneHotEncoder(), conf.CATEGORICAL_VARS)],
+        [('OHE', OneHotEncoder(handle_unknown='ignore'), conf.CATEGORICAL_VARS)],
         remainder='passthrough'
         )
 

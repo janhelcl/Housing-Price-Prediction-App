@@ -26,3 +26,6 @@ DROP_FEATURES = ['YrSold']
 
 # variables to log transform
 NUMERICALS_LOG_VARS = ['GrLivArea']
+
+# validation
+NAN_NOT_ALLOWED = ['GarageFinish']
