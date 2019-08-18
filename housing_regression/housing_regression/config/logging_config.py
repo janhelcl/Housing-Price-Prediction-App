@@ -2,9 +2,6 @@
 Configuration of logging througout the whole package
 """
 import os
-"""
-Configuration of the logger for the whole package
-"""
 import sys
 import logging
 import logging.handlers
