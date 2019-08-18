@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify
 
 import housing_regression as hr
 
+
 version_endpoint = Blueprint('version_endpoint', __name__)
 
 
