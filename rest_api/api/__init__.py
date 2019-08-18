@@ -6,6 +6,7 @@ import os
 from flask import Flask
 
 from api.blueprints.version_endpoint import version_endpoint
+from api.blueprints.dev_endpoint import dev_endpoint
 
 
 with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as ver_f:
@@ -18,5 +19,6 @@ def create_app():
     app = Flask(__name__)
     
     app.register_blueprint(version_endpoint)
+    app.register_blueprint(dev_endpoint)
     
     return app
