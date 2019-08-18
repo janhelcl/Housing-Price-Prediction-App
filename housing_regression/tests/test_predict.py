@@ -5,32 +5,37 @@ import json
 import sys
 sys.path.append('..')
 
+import pytest
+
+from housing_regression.models import MODELS
 from housing_regression.predict import predict
 from housing_regression.processing.data_management import load_dataset
 
 
 TEST_DATA = '../housing_regression/data/test.csv'
-DEV_PIPELINE = '../housing_regression/trained_models/dev_pipe.pkl'
+MODEL_NAMES = MODELS.keys()
 
 
-def test_single_predict():
-    """Can the dev pipeline predict a previously unseen observation?
+@pytest.mark.parametrize('model_name', MODEL_NAMES)
+def test_single_predict(model_name):
+    """Can the models predict a previously unseen observation?
     """
     test_data = load_dataset(TEST_DATA)
     single_json = test_data.iloc[[0]].to_json(orient='records')
-    scored = predict(single_json, DEV_PIPELINE)
+    scored = predict(single_json, model_name)
     
     assert scored is not None
     assert isinstance(scored['prediction'][0], float)
     assert json.dumps(scored)
+
     
-    
-def test_multiple_predict():
-    """Can the dev pipeline predict multiple unseen observations?
+@pytest.mark.parametrize('model_name', MODEL_NAMES)    
+def test_multiple_predict(model_name):
+    """Can the models predict multiple unseen observations?
     """
     test_data = load_dataset(TEST_DATA)
     single_json = test_data.to_json(orient='records')
-    scored = predict(single_json, DEV_PIPELINE)
+    scored = predict(single_json, model_name)
     
     assert scored is not None
     assert isinstance(scored['prediction'], list)
