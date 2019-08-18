@@ -2,7 +2,6 @@
 Endpoint returning version of the application and models
 """
 from flask import Blueprint, jsonify
-
 import housing_regression as hr
 
 
