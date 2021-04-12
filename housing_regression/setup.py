@@ -45,7 +45,7 @@ setup(
     url=URL,
     packages=find_packages(exclude=('tests',)),
     package_data={NAME: ['VERSION']},
-    install_requires= [], # list_reqs(),
+    install_requires=list_reqs(),
     extras_require={},
     include_package_data=True,
     license='MIT',

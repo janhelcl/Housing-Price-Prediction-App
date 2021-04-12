@@ -1,0 +1,2 @@
+flask==1.0.2
+-e "C:\Users\jhelcl001\Desktop\housing_regression\Housing-Price-Prediction-App\housing_regression"

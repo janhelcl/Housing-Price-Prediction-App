@@ -6,18 +6,25 @@ import sys
 sys.path.append('..')
 
 from sklearn.pipeline import Pipeline
+import pytest
 
+from housing_regression.models import MODELS
 from housing_regression.train import train_pipeline
 from housing_regression.processing.data_management import load_pipeline
 
 
-def test_train_pipeline():
+TRAIN_DATA = '../housing_regression/data/train.csv'
+MODEL_NAMES = MODELS.keys()
+
+
+@pytest.mark.parametrize('model_name', MODEL_NAMES)
+def test_train_pipeline(model_name):
     """Can the dev pipeline be trained and saved?
     """
     # train the dev pipeline and save it to temporary directory
     temp_dir = tempfile.mkdtemp()
     temp_path = temp_dir + 'pipe.pkl'
-    train_pipeline('../housing_regression/data/train.csv', temp_path)
+    train_pipeline(TRAIN_DATA, model_name, temp_path)
     pipeline = load_pipeline(temp_path)
     
     assert isinstance(pipeline, Pipeline)

@@ -1,9 +1,12 @@
 """
 Configuration of a simple model used to test various aspects of the pipeline
 """
-SEED = 42
+import housing_regression.config.global_config as glc
 
-LABEL = 'SalePrice'
+
+NAME = 'DevModel'
+PATH = glc.PATH_TO_TRAINED_MODELS + NAME + '.pkl'
+
 
 # all variables used in the pipeline
 FEATURES = [# predictors
