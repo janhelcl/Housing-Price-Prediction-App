@@ -5,8 +5,8 @@ import os
 
 from flask import Flask
 
-from api.blueprints.version_endpoint import version_endpoint
-from api.blueprints.dev_endpoint import dev_endpoint
+from rest_api.api.blueprints.version_endpoint import version_endpoint
+from rest_api.api.blueprints.dev_endpoint import dev_endpoint
 
 
 with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as ver_f:

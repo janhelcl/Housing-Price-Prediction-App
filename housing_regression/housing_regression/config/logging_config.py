@@ -1,24 +1,23 @@
 """
 Configuration of logging througout the whole package
 """
-import os
-import sys
 import logging
 import logging.handlers
-
+import os
+import sys
 
 FORMATTER = logging.Formatter(
-    "%(asctime)s — %(name)s — %(levelname)s —"
-    "%(funcName)s:%(lineno)d — %(message)s")
+    "%(asctime)s — %(name)s — %(levelname)s —" "%(funcName)s:%(lineno)d — %(message)s"
+)
 
 
-LOG_DIR =  os.path.join(os.path.dirname(__file__), '..\logs')
-LOG_FILE = LOG_DIR + '\logs.log'
+LOG_DIR = os.path.join(os.path.dirname(__file__), "..\logs")
+LOG_FILE = LOG_DIR + "\logs.log"
 
 
 if not os.path.exists(LOG_FILE):
     os.makedirs(LOG_DIR)
-    open(LOG_FILE, 'a').close() # os.mknod requires elevated rights
+    open(LOG_FILE, "a").close()
 
 
 def get_console_handler():
@@ -28,8 +27,7 @@ def get_console_handler():
 
 
 def get_file_handler():
-    file_handler = logging.handlers.TimedRotatingFileHandler(LOG_FILE, 
-                                                             when='midnight')
+    file_handler = logging.handlers.TimedRotatingFileHandler(LOG_FILE, when="midnight")
     file_handler.setFormatter(FORMATTER)
     return file_handler
 
@@ -41,4 +39,3 @@ def get_logger(logger_name, level=logging.INFO):
     logger.addHandler(get_file_handler())
     logger.propagate = False
     return logger
-    
