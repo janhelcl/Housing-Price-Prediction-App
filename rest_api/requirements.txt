@@ -1,3 +1,5 @@
+--extra-index-url=${PIP_EXTRA_INDEX_URL}
+
 flask==1.0.2
 uvicorn>=0.11.3
--e ".\housing_regression"
+housing_regression==1.0.0
