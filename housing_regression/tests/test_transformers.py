@@ -121,7 +121,7 @@ class TestColumnTransformerDF:
         """Does the transformer preserve column ordering and dtypes?"""
         transformed = transformer.fit_transform(data)
 
-        assert np.all(data.columns, transformed.columns)
+        assert list(data.columns) == list(transformed.columns)
         assert data.dtypes.equals(transformed.dtypes)
         assert data.shape == transformed.shape
 
