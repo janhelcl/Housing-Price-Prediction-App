@@ -35,7 +35,6 @@ jobs:
       - run:
           name: Fetch the data
           command: |
-            sudo apt-get install unzip
             tox -e fetch_data
       - run:
           name: Test the model package
