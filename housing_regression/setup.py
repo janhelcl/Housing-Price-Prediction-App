@@ -12,7 +12,7 @@ AUTHOR = 'Jan Helcl'
 REQUIRES_PYTHON = '>=3.6.0'
 
 
-def list_reqs(fname='requirements.txt'):
+def list_reqs(fname='requirements/requirements.txt'):
     with open(fname) as fd:
         return fd.read().splitlines()
 
