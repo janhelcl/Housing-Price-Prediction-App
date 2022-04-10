@@ -27,7 +27,7 @@ jobs:
 
   test_and_upload_regression_model:
     <<: *defaults
-    working_directory: ~/project/shousing_regression
+    working_directory: ~/project/housing_regression
     steps:
       - checkout:
           path: ~/project
