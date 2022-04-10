@@ -5,7 +5,7 @@ defaults: &defaults
     - image: circleci/python:3.9.5
   working_directory: ~/project
 
- prepare_tox: &prepare_tox
+prepare_tox: &prepare_tox
   run:
     name: Install tox
     command: |
