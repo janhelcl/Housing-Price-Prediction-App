@@ -4,7 +4,7 @@ defaults: &defaults
   docker:
     - image: circleci/python:3.9.5
   working_directory: ~/project
-  
+
  prepare_tox: &prepare_tox
   run:
     name: Install tox
@@ -24,7 +24,7 @@ jobs:
           name: Runnning app tests
           command: |
             tox
-            
+
   deploy_app_to_heroku:
     <<: *defaults
     steps:
